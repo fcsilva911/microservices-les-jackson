@@ -16,6 +16,9 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+var config = app.Services.GetRequiredService<IConfiguration>();
+
+Console.WriteLine($"--> CommandService Endpoint {config["CommandService"]}");
 
 // Configure the HTTP request pipeline.
 
