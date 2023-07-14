@@ -7,9 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformService", "Platform
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "K8S", "K8S", "{5860ADEB-6AEA-4B5A-AB98-A6C108873F13}"
 	ProjectSection(SolutionItems) = preProject
+		commands-depl.yaml = commands-depl.yaml
+		ingress-srv.yaml = ingress-srv.yaml
 		platforms-depl.yaml = platforms-depl.yaml
 		platforms-np-srv.yaml = platforms-np-srv.yaml
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandsService", "CommandsService\CommandsService.csproj", "{9A9897D8-627A-42DF-9D93-C45119DB428C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,10 @@ Global
 		{668663C6-1BCA-4A40-A1BF-FDFAFAF8EB62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{668663C6-1BCA-4A40-A1BF-FDFAFAF8EB62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{668663C6-1BCA-4A40-A1BF-FDFAFAF8EB62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A9897D8-627A-42DF-9D93-C45119DB428C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A9897D8-627A-42DF-9D93-C45119DB428C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A9897D8-627A-42DF-9D93-C45119DB428C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A9897D8-627A-42DF-9D93-C45119DB428C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
