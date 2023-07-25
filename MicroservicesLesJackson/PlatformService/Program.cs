@@ -5,8 +5,18 @@ using PlatformService.SyncDataServices.Http;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseInMemoryDatabase("inMem"));
+if (builder.Environment.IsProduction())
+{
+    Console.WriteLine("--> Using SQL Server DB");
+    builder.Services.AddDbContext<AppDbContext>(opt => 
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("PlatformsConn")));
+}
+else
+{
+    Console.WriteLine("--> Using InMem DB");
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseInMemoryDatabase("inMem"));
+}
 
 builder.Services.AddScoped<IPlatformRepository, PlaformRepository>();
 
@@ -28,6 +38,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.PreparePopulation();
+app.PreparePopulation(builder.Environment.IsProduction());
 
 app.Run();
