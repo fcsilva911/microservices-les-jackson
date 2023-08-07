@@ -1,5 +1,6 @@
 ﻿using PlatformService.DTOs;
 using RabbitMQ.Client;
+using System.Text;
 using System.Text.Json;
 
 namespace PlatformService.AsyncDataServices
@@ -9,6 +10,7 @@ namespace PlatformService.AsyncDataServices
         private readonly IConfiguration _configuration;
         private readonly IConnection _connection;
         private readonly IModel _channel;
+        private const string EXCHANGE_NAME = "trigger";
 
         public MessageBusClient(IConfiguration configuration)
         {
@@ -22,7 +24,7 @@ namespace PlatformService.AsyncDataServices
             {
                 _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();
-                _channel.ExchangeDeclare("trigger", ExchangeType.Fanout);
+                _channel.ExchangeDeclare(EXCHANGE_NAME, ExchangeType.Fanout);
                 _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
                 Console.WriteLine("--> Connected to MessageBus");
             }
@@ -40,6 +42,34 @@ namespace PlatformService.AsyncDataServices
         public void PublishNewPlatform(PlatformPublishedDto platformPublishedDto)
         {
             var message = JsonSerializer.Serialize(platformPublishedDto);
+
+            if (_connection.IsOpen)
+            {
+                Console.WriteLine($"--> RabbitMQ connection Open, sending message: {message}");
+                SendMessage(message);
+            }
+            else
+            {
+                Console.WriteLine($"--> RabbitMQ connection Closed, not sending message: {message}");
+            }
+        }
+
+        public void Dispose()
+        {
+            Console.WriteLine("--> MessageBus Disposed");
+            if (_channel.IsOpen)
+            {
+                _channel.Close();
+                _connection.Close();
+            }
+        }
+
+        private void SendMessage(string message)
+        {
+            var body = Encoding.UTF8.GetBytes(message);
+
+            _channel.BasicPublish(EXCHANGE_NAME, "", null, body);
+            Console.WriteLine($"We have sent {message}");
         }
     }
 }
