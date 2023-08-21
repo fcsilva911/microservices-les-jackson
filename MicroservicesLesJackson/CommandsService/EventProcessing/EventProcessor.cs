@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using CommandsService.Data;
 using CommandsService.DTOs;
+using CommandsService.Models;
 using System.Text.Json;
 
 namespace CommandsService.EventProcessing
@@ -17,7 +19,15 @@ namespace CommandsService.EventProcessing
 
         public void ProcessEvent(string message)
         {
-            throw new NotImplementedException();
+            var eventType = DetermineEvent(message);
+            switch (eventType)
+            {
+                case EventType.PlatformPublished:
+                    // TODO:
+                    break;
+                default:
+                    break;
+            }
         }
 
         private EventType DetermineEvent(string notificationMessage)
@@ -28,12 +38,39 @@ namespace CommandsService.EventProcessing
 
             switch (eventType.Event)
             {
-                case "Platform_Published": 
+                case "Platform_Published":
                     Console.WriteLine("--> Platform Published Event Detected");
                     return EventType.PlatformPublished;
                 default:
                     Console.WriteLine("--> Could not determine event type");
                     return EventType.Undetermined;
+            }
+        }
+
+        private void AddPlatform(string platformPublishedMessage)
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var repo = scope.ServiceProvider.GetRequiredService<ICommandRepo>();
+                var platformPublishedDto = JsonSerializer.Deserialize<PlatformPublishedDto>(platformPublishedMessage);
+
+                try
+                {
+                    var plat = _mapper.Map<Platform>(platformPublishedDto);
+                    if (repo.ExternalPlatformExists(plat.ExternalId))
+                    {
+                        Console.WriteLine("--> Platform already exists...");
+                    }
+                    else
+                    {
+                        repo.CreatePlatform(plat);
+                        repo.SaveChanges();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"--> Could not add Platform to DB {ex}");
+                }
             }
         }
     }
